@@ -1,3 +1,15 @@
+// === ĐOẠN CODE SỬA LỖI PORT CHO RENDER ===
+const http = require('http');
+const serverPort = process.env.PORT || 3000;
+http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('Bot Minecraft AFK is running!\n');
+}).listen(serverPort, () => {
+  console.log(`✅ Web server running on port ${serverPort}`);
+});
+// ==========================================
+
 const mineflayer = require('mineflayer');
 const config = require('./config.json');
 
@@ -64,3 +76,4 @@ bot.on('error', (err) => {
 bot.on('end', () => {
   console.log('⛔️ Bot Disconnected!');
 });
+

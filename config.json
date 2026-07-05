@@ -1,6 +1,6 @@
 {
-  "serverHost": "sinhton-2qHf.aternos.me",
-  "serverPort": 56855,
+  "serverHost": "dynamic-8.magmanode.com:25967",
+  "serverPort": 25967,
   "botUsername": "MyBot",
   "botChunk": 1,
   "serverVersion": "1.20",

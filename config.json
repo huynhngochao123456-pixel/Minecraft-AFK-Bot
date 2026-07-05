@@ -2,5 +2,7 @@
   "serverHost": "sinhton-2qHf.aternos.me",
   "serverPort": 56855,
   "botUsername": "MyBot",
-  "botChunk": 1
+  "botChunk": 1,
+  "serverVersion": "1.20",
+  "botPassword": "matkhaucuanb"
 }

@@ -1,5 +1,5 @@
 {
-  "serverHost": "dynamic-8.magmanode.com:25967",
+  "serverHost": "dynamic-8.magmanode.com",
   "serverPort": 25967,
   "botUsername": "MyBot",
   "botChunk": 1,

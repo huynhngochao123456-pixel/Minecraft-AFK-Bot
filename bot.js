@@ -23,7 +23,7 @@ function createBotInstance() {
     username: config.botUsername,
     auth: 'offline',
     version: config.serverVersion || false,
-    viewDistance: 'tiny'
+    viewDistance: 0 // ĐÃ CHỈNH SỬA: Ép tầm nhìn về 0 để tắt hoàn toàn tính năng load chunk của bot
   });
 
   bot.on('spawn', () => {

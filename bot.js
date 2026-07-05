@@ -1,79 +1,53 @@
-// === ĐOẠN CODE SỬA LỖI PORT CHO RENDER ===
+// Tự động mở cổng giữ mạng 24/7 trên Render
 const http = require('http');
-const serverPort = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 http.createServer((req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
-  res.end('Bot Minecraft AFK is running!\n');
-}).listen(serverPort, () => {
-  console.log(`✅ Web server running on port ${serverPort}`);
+  res.end('Bot Minecraft Online!\n');
+}).listen(port, () => {
+  console.log(`[SYSTEM] Web Server kích hoạt thành công trên cổng ${port}`);
 });
-// ==========================================
 
 const mineflayer = require('mineflayer');
 const config = require('./config.json');
 
-const bot = mineflayer.createBot({
-  host: config.serverHost,
-  port: config.serverPort,
-  username: config.botUsername,
-  auth: 'offline',
-  version: false,
-  viewDistance: config.botChunk
-});
+let bot;
 
-let movementPhase = 0;
-const STEP_INTERVAL = 1500;
-const STEP_SPEED    = 1;
-const JUMP_DURATION = 500;
+function createBotInstance() {
+  console.log(`[CONNECTING] Đang kết nối tới server ${config.serverHost}:${config.serverPort}...`);
+  
+  bot = mineflayer.createBot({
+    host: config.serverHost,
+    port: parseInt(config.serverPort),
+    username: config.botUsername,
+    auth: 'offline',
+    version: config.serverVersion || false,
+    viewDistance: 'tiny'
+  });
 
-bot.on('spawn', () => {
-  setTimeout(() => {
-    bot.setControlState('sneak', true);
-    console.log(`✅ ${config.botUsername} is Ready!`);
-  }, 3000);
+  bot.on('spawn', () => {
+    console.log(`\x1b[32m✅ [SUCCESS] Bot ${config.botUsername} đã vào game thành công!\x1b[0m`);
+    
+    // Nhảy liên tục chống kick AFK
+    setInterval(() => {
+      if (bot.entity) {
+        bot.setControlState('jump', true);
+        setTimeout(() => bot.setControlState('jump', false), 400);
+      }
+    }, 3000);
+  });
 
-  setTimeout(movementCycle, STEP_INTERVAL);
-});
+  // Tự động kết nối lại nếu bị kick hoặc server khởi động lại
+  bot.on('end', (reason) => {
+    console.log(`[DISCONNECTED] Bot bị ngắt kết nối. Lý do: ${reason}. Sẽ thử lại sau 15 giây...`);
+    setTimeout(createBotInstance, 15000);
+  });
 
-function movementCycle() {
-  if (!bot.entity) return;
-
-  switch (movementPhase) {
-    case 0:
-      bot.setControlState('forward', true);
-      bot.setControlState('back', false);
-      bot.setControlState('jump', false);
-      break;
-    case 1:
-      bot.setControlState('forward', false);
-      bot.setControlState('back', true);
-      bot.setControlState('jump', false);
-      break;
-    case 2:
-      bot.setControlState('forward', false);
-      bot.setControlState('back', false);
-      bot.setControlState('jump', true);
-      setTimeout(() => {
-        bot.setControlState('jump', false);
-      }, JUMP_DURATION);
-      break;
-    case 3:
-      bot.setControlState('forward', false);
-      bot.setControlState('back', false);
-      bot.setControlState('jump', false);
-      break;
-  }
-
-  movementPhase = (movementPhase + 1) % 4;
-
-  setTimeout(movementCycle, STEP_INTERVAL);
+  bot.on('error', (err) => {
+    console.error(`[ERROR] Gặp lỗi mạng: ${err.message}`);
+  });
 }
 
-bot.on('error', (err) => {
-  console.error('⚠️ Error:', err);
-});
-bot.on('end', () => {
-  console.log('⛔️ Bot Disconnected!');
-});
-
+// Chạy bot
+createBotInstance();
